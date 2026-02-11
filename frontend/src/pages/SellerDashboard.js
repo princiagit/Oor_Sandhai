@@ -1,9 +1,119 @@
-import React from 'react'
+import { useState, useEffect } from "react";
+import API from "../services/api";
+import "./Seller.css";
 
 function SellerDashboard() {
+  const [product, setProduct] = useState({
+    name: "",
+    price: "",
+    category: "",
+    description: "",
+  });
+
+  const [products, setProducts] = useState([]);
+
+  //Fetch products from DB
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await API.get("/products");
+      setProducts(response.data);
+    } catch (error) {
+      console.log("Error fetching products");
+    }
+  };
+
+  const handleChange = (e) => {
+    setProduct({
+      ...product,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleAddProduct = async (e) => {
+    e.preventDefault();
+
+    try {
+      await API.post("/products", product);
+      alert("Product added successfully");
+      setProduct({
+        name: "",
+        price: "",
+        category: "",
+        description: "",
+      });
+      fetchProducts(); //refresh product list
+    } catch (error) {
+      alert("Error adding product");
+    }
+  };
+
   return (
-    <div>SellerDashboard</div>
-  )
+    <div className="seller-container">
+      <h2>Seller Dashboard</h2>
+
+      <div className="seller-card">
+        <h3>Add Product</h3>
+        <form onSubmit={handleAddProduct}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Product Name"
+            value={product.name}
+            onChange={handleChange}
+            required
+          />
+
+          <input
+            type="number"
+            name="price"
+            placeholder="Price"
+            value={product.price}
+            onChange={handleChange}
+            required
+          />
+
+          <input
+            type="text"
+            name="category"
+            placeholder="Category"
+            value={product.category}
+            onChange={handleChange}
+          />
+
+          <textarea
+            name="description"
+            placeholder="Description"
+            value={product.description}
+            onChange={handleChange}
+          />
+
+          <button type="submit" className="primary-btn">
+            Add Product
+          </button>
+        </form>
+      </div>
+
+      <div className="seller-card">
+        <h3>My Products</h3>
+
+        {products.length === 0 ? (
+          <p>No products added yet.</p>
+        ) : (
+          <div className="seller-product-list">
+            {products.map((p) => (
+              <div key={p._id} className="seller-product-item">
+                <strong>{p.name}</strong> – ₹{p.price} ({p.category})
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
-export default SellerDashboard
+export default SellerDashboard;

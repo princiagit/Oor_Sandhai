@@ -1,36 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import "./Buyer.css";
+import API from "../services/api";
 
 function BuyerHome() {
-  const productsData = [
-    {
-      id: 1,
-      name: "Fresh Tomatoes",
-      price: 30,
-      category: "Vegetables",
-    },
-    {
-      id: 2,
-      name: "Organic Rice",
-      price: 60,
-      category: "Grains",
-    },
-    {
-      id: 3,
-      name: "Milk",
-      price: 25,
-      category: "Dairy",
-    },
-  ];
-
   const [cart, setCart] = useState([]);
+  const [products, setProducts] = useState([]);
 
+  // 🔥 Fetch products from backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await API.get("/products");
+        setProducts(response.data);
+      } catch (error) {
+        console.log("Error fetching products");
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // 🔥 Add to cart (use _id)
   const addToCart = (product) => {
-    const existingItem = cart.find((item) => item.id === product.id);
+    const existingItem = cart.find((item) => item._id === product._id);
 
     if (existingItem) {
       setCart(
         cart.map((item) =>
-          item.id === product.id
+          item._id === product._id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         )
@@ -43,7 +40,7 @@ function BuyerHome() {
   const increaseQty = (id) => {
     setCart(
       cart.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+        item._id === id ? { ...item, quantity: item.quantity + 1 } : item
       )
     );
   };
@@ -52,7 +49,7 @@ function BuyerHome() {
     setCart(
       cart
         .map((item) =>
-          item.id === id
+          item._id === id
             ? { ...item, quantity: item.quantity - 1 }
             : item
         )
@@ -66,43 +63,62 @@ function BuyerHome() {
   );
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h2>Buyer Home – Oor Sandhai</h2>
+    <div className="buyer-container">
+      <h2 className="buyer-title">Welcome to Oor Sandhai</h2>
 
-      <h3>Available Products</h3>
-      <ul>
-        {productsData.map((product) => (
-          <li key={product.id}>
-            <strong>{product.name}</strong> – ₹{product.price} (
-            {product.category})
+      {/* Products Section */}
+      <h3 className="section-title">Available Products</h3>
+      <div className="product-grid">
+        {products.map((product) => (
+          <div className="product-card" key={product._id}>
+            <div className="product-image-placeholder"></div>
+            <h4>{product.name}</h4>
+            <p className="category">{product.category}</p>
+            <p className="price">₹{product.price}</p>
             <button
-              style={{ marginLeft: "10px" }}
+              className="primary-btn"
               onClick={() => addToCart(product)}
             >
               Add to Cart
             </button>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
 
-      <hr />
+      {/* Cart Section */}
+      <div className="cart-section">
+        <h3 className="section-title">My Cart</h3>
 
-      <h3>My Cart</h3>
-      {cart.length === 0 && <p>Your cart is empty.</p>}
+        {cart.length === 0 ? (
+          <p className="empty-cart">Your cart is empty.</p>
+        ) : (
+          <>
+            <div className="cart-items">
+              {cart.map((item) => (
+                <div className="cart-item" key={item._id}>
+                  <div>
+                    <h4>{item.name}</h4>
+                    <p>₹{item.price}</p>
+                  </div>
 
-      <ul>
-        {cart.map((item) => (
-          <li key={item.id}>
-            {item.name} – ₹{item.price} × {item.quantity}
-            <button onClick={() => increaseQty(item.id)}> + </button>
-            <button onClick={() => decreaseQty(item.id)}> − </button>
-          </li>
-        ))}
-      </ul>
+                  <div className="qty-controls">
+                    <button onClick={() => decreaseQty(item._id)}>-</button>
+                    <span>{item.quantity}</span>
+                    <button onClick={() => increaseQty(item._id)}>+</button>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-      <h4>Total Amount: ₹{totalAmount}</h4>
-
-      {cart.length > 0 && <button>Place Order</button>}
+            <div className="cart-footer">
+              <h4>Total: ₹{totalAmount}</h4>
+              <button className="primary-btn place-order-btn">
+                Place Order
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

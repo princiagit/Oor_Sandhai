@@ -1,0 +1,33 @@
+.seller-container {
+  padding: 40px;
+  background: #f4f6f8;
+  min-height: 100vh;
+}
+
+.seller-card {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.seller-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.seller-card input,
+.seller-card textarea {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
+
+.seller-product-item {
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}

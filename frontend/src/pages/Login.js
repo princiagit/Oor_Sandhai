@@ -1,68 +1,103 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../services/api";
+
+import "./Auth.css";
 
 function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("buyer");
+  const [role, setRole] = useState("select");
+  const [error, setError] = useState("");
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+  const handleLogin = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    console.log({ email, password, role });
+  if (role === "select") {
+    setError("Select your role");
+    return;
+  }
 
-    if (role === "buyer") navigate("/buyer");
-    if (role === "seller") navigate("/seller");
-    if (role === "delivery") navigate("/delivery");
-  };
+  try {
+    const response = await API.post("/auth/login", {
+      email,
+      password,
+    });
+
+    const { token, role: userRole } = response.data;
+
+    // 🔥 ROLE CHECK
+    if (role !== userRole) {
+      alert(`You are registered as ${userRole}. Please login with correct role.`);
+      return; // stop execution
+    }
+
+    // If role matches
+    localStorage.setItem("token", token);
+    localStorage.setItem("role", userRole);
+
+    if (userRole === "buyer") navigate("/buyer");
+    if (userRole === "seller") navigate("/seller");
+    if (userRole === "delivery") navigate("/delivery");
+
+  } catch (error) {
+    setError(error.response?.data?.message || "Login failed");
+  }
+};
+
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h2>Login – Oor Sandhai</h2>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title">Welcome to Ungal Oor Sandhai</h2>
+        <p className="auth-subtitle">Login to continue</p>
 
-      <form onSubmit={handleLogin}>
+       <form onSubmit={handleLogin} className="auth-form">
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <br /><br />
 
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Enter your password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <br /><br />
 
-        <label>Login as:</label>
-        <br />
-        <select value={role} onChange={(e) => setRole(e.target.value)}>
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+        >
+          <option value="select">Select</option>
           <option value="buyer">Buyer</option>
           <option value="seller">Seller</option>
           <option value="delivery">Delivery Partner</option>
         </select>
 
-        <br /><br />
+        {/* 🔥 Error message here */}
+        {error && <p className="error-text">{error}</p>}
 
-        <button type="submit">Login</button>
+        <button type="submit" className="primary-btn">
+          Login
+        </button>
       </form>
 
-      <p>
-        New user?{" "}
-        <span
-          style={{ color: "blue", cursor: "pointer" }}
-          onClick={() => navigate("/register")}
-        >
-          Register here
-        </span>
-      </p>
+
+        <p className="auth-footer">
+          Don’t have an account?{" "}
+          <span onClick={() => navigate("/register")}>
+            Register
+          </span>
+        </p>
+      </div>
     </div>
   );
 }

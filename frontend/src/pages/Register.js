@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./Auth.css";
+import API from "../services/api";
 
 function Register() {
   const navigate = useNavigate();
@@ -8,7 +10,7 @@ function Register() {
     name: "",
     email: "",
     password: "",
-    role: "buyer",
+    role: "select",
   });
 
   const handleChange = (e) => {
@@ -18,70 +20,77 @@ function Register() {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Register Data:", formData);
-    alert("Registered successfully (frontend only)");
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await API.post("/auth/register", formData);
+    alert(response.data.message);
     navigate("/");
-  };
+  } catch (error) {
+    alert(error.response?.data?.message || "Registration failed");
+  }
+};
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h2>Register – Oor Sandhai</h2>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title">Create Account</h2>
+        <p className="auth-subtitle">
+          Join Ungal Oor Sandhai today
+        </p>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
-        <br /><br />
+        <form onSubmit={handleSubmit} className="auth-form">
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-        <br /><br />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email Address"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-        <br /><br />
+          <input
+            type="password"
+            name="password"
+            placeholder="Create Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
 
-        <label>Role:</label>
-        <br />
-        <select name="role" value={formData.role} onChange={handleChange}>
-          <option value="buyer">Buyer</option>
-          <option value="seller">Seller</option>
-          <option value="delivery">Delivery Partner</option>
-        </select>
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+          >
+            <option value = "select">Select</option>
+            <option value="buyer">Buyer</option>
+            <option value="seller">Seller</option>
+            <option value="delivery">Delivery Partner</option>
+          </select>
 
-        <br /><br />
+          <button type="submit" className="primary-btn">
+            Register
+          </button>
+        </form>
 
-        <button type="submit">Register</button>
-      </form>
-
-      <p>
-        Already have an account?{" "}
-        <span
-          style={{ color: "blue", cursor: "pointer" }}
-          onClick={() => navigate("/")}
-        >
-          Login
-        </span>
-      </p>
+        <p className="auth-footer">
+          Already have an account?{" "}
+          <span onClick={() => navigate("/")}>
+            Login
+          </span>
+        </p>
+      </div>
     </div>
   );
 }
