@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import BuyerHome from "./pages/BuyerHome";
 import SellerDashboard from "./pages/SellerDashboard";
 import DeliveryDashboard from "./pages/DeliveryDashboard";
+import SellerOrders from "./pages/SellerOrders";
 function App() {
   return (
     <Router>
@@ -13,6 +14,7 @@ function App() {
         <Route path="/buyer" element={<BuyerHome />} />
         <Route path="/seller" element={<SellerDashboard />} />
         <Route path="/delivery" element={<DeliveryDashboard />} />
+        <Route path="/seller/orders" element={<SellerOrders />} />
       </Routes>
     </Router>
   );

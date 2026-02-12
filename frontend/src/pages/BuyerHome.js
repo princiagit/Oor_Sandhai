@@ -6,7 +6,7 @@ function BuyerHome() {
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
 
-  // 🔥 Fetch products from backend
+  //Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -20,7 +20,7 @@ function BuyerHome() {
     fetchProducts();
   }, []);
 
-  // 🔥 Add to cart (use _id)
+  // Add to cart (use _id)
   const addToCart = (product) => {
     const existingItem = cart.find((item) => item._id === product._id);
 
@@ -61,6 +61,31 @@ function BuyerHome() {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+
+  const handlePlaceOrder = async () => {
+  try {
+    const buyerId = localStorage.getItem("userId"); // we will store this soon
+
+    const orderData = {
+      buyerId,
+      items: cart.map((item) => ({
+        productId: item._id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      })),
+      totalAmount,
+    };
+
+    await API.post("/orders", orderData);
+
+    alert("Order placed successfully!");
+    setCart([]);
+  } catch (error) {
+    alert("Error placing order");
+  }
+};
+
 
   return (
     <div className="buyer-container">
@@ -112,9 +137,13 @@ function BuyerHome() {
 
             <div className="cart-footer">
               <h4>Total: ₹{totalAmount}</h4>
-              <button className="primary-btn place-order-btn">
+              <button
+                  className="primary-btn place-order-btn"
+                  onClick={handlePlaceOrder}
+                  disabled={cart.length === 0}
+                >
                 Place Order
-              </button>
+                </button>
             </div>
           </>
         )}

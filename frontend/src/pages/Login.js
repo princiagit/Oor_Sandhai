@@ -27,9 +27,9 @@ function Login() {
       password,
     });
 
-    const { token, role: userRole } = response.data;
+    const { token, role: userRole,id } = response.data;
 
-    // 🔥 ROLE CHECK
+    // ROLE CHECK
     if (role !== userRole) {
       alert(`You are registered as ${userRole}. Please login with correct role.`);
       return; // stop execution
@@ -38,6 +38,7 @@ function Login() {
     // If role matches
     localStorage.setItem("token", token);
     localStorage.setItem("role", userRole);
+    localStorage.setItem("userId",id);
 
     if (userRole === "buyer") navigate("/buyer");
     if (userRole === "seller") navigate("/seller");
@@ -82,7 +83,7 @@ function Login() {
           <option value="delivery">Delivery Partner</option>
         </select>
 
-        {/* 🔥 Error message here */}
+        {/* Error message here */}
         {error && <p className="error-text">{error}</p>}
 
         <button type="submit" className="primary-btn">

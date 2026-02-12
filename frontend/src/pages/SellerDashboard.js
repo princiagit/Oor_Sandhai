@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import API from "../services/api";
+import { useNavigate } from "react-router-dom";
+
+
 import "./Seller.css";
 
 function SellerDashboard() {
@@ -11,6 +14,7 @@ function SellerDashboard() {
   });
 
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
 
   //Fetch products from DB
   useEffect(() => {
@@ -91,9 +95,13 @@ function SellerDashboard() {
             onChange={handleChange}
           />
 
-          <button type="submit" className="primary-btn">
-            Add Product
+          <button
+            className="primary-btn"
+            onClick={() => navigate("/seller/orders")}
+          >
+            View Orders
           </button>
+
         </form>
       </div>
 
