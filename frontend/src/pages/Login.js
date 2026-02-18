@@ -66,12 +66,13 @@ function Login() {
         />
 
         <input
-          type="password"
-          placeholder="Enter your password"
+         placeholder="Enter your password"
+         type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-        />
+        /> 
+          
 
         <select
           value={role}

@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import "./Buyer.css";
 import API from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 function BuyerHome() {
+  const navigate = useNavigate();
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
 
@@ -112,6 +114,9 @@ function BuyerHome() {
 
       {/* Cart Section */}
       <div className="cart-section">
+        <button className="primary-btn" onClick={() => navigate("/my-orders")}>
+              View My Orders
+        </button>
         <h3 className="section-title">My Cart</h3>
 
         {cart.length === 0 ? (
@@ -144,6 +149,7 @@ function BuyerHome() {
                 >
                 Place Order
                 </button>
+
             </div>
           </>
         )}

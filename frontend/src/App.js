@@ -5,6 +5,9 @@ import BuyerHome from "./pages/BuyerHome";
 import SellerDashboard from "./pages/SellerDashboard";
 import DeliveryDashboard from "./pages/DeliveryDashboard";
 import SellerOrders from "./pages/SellerOrders";
+import BuyerOrders from "./pages/BuyerOrders";
+
+
 function App() {
   return (
     <Router>
@@ -15,6 +18,8 @@ function App() {
         <Route path="/seller" element={<SellerDashboard />} />
         <Route path="/delivery" element={<DeliveryDashboard />} />
         <Route path="/seller/orders" element={<SellerOrders />} />
+        <Route path="/delivery" element={<DeliveryDashboard />} />
+        <Route path="/my-orders" element={<BuyerOrders />} />
       </Routes>
     </Router>
   );
