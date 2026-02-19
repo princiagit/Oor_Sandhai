@@ -88,10 +88,35 @@ function BuyerHome() {
   }
 };
 
+const handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  localStorage.removeItem("userId");
+
+  navigate("/");
+};
+
+
 
   return (
     <div className="buyer-container">
-      <h2 className="buyer-title">Welcome to Oor Sandhai</h2>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h2 className="buyer-title">Welcome to Oor Sandhai</h2>
+            <button
+              onClick={handleLogout}
+              style={{
+                backgroundColor: "#ff4d4d",
+                color: "white",
+                border: "none",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                cursor: "pointer"
+              }}
+            >
+              Logout
+            </button>
+          </div>
+      
 
       {/* Products Section */}
       <h3 className="section-title">Available Products</h3>
@@ -149,9 +174,8 @@ function BuyerHome() {
                 >
                 Place Order
                 </button>
-
-            </div>
-          </>
+              </div>
+            </>
         )}
       </div>
     </div>

@@ -54,11 +54,34 @@ function SellerDashboard() {
       alert("Error adding product");
     }
   };
+  const handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  localStorage.removeItem("userId");
+
+  navigate("/");
+};
 
   return (
     <div className="seller-container">
-      <h2>Seller Dashboard</h2>
-
+      <div className = "row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className = "col-6">
+          <h2>Seller Dashboard</h2>
+        </div>
+        <div className="col-6">
+          <button
+              onClick={handleLogout}
+              style={{
+                backgroundColor: "#ff4d4d",
+                color: "white",
+                border: "none",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                cursor: "pointer"
+              }}>Logout
+          </button>
+        </div>
+      </div>
       <div className="seller-card">
         <h3>Add Product</h3>
         <form onSubmit={handleAddProduct}>
@@ -94,6 +117,10 @@ function SellerDashboard() {
             value={product.description}
             onChange={handleChange}
           />
+          <button
+            className="primary-btn"
+            onClick={() => navigate("/seller")} 
+          >Submit</button>
 
           <button
             className="primary-btn"
