@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import API from "../services/api";
 import { useNavigate } from "react-router-dom";
-
-
 import "./Seller.css";
 
 function SellerDashboard() {
+  const navigate = useNavigate();
+
   const [product, setProduct] = useState({
     name: "",
     price: "",
@@ -14,22 +14,23 @@ function SellerDashboard() {
   });
 
   const [products, setProducts] = useState([]);
-  const navigate = useNavigate();
+  const [image, setImage] = useState(null);
 
-  //Fetch products from DB
+  //Fetch products
   useEffect(() => {
     fetchProducts();
   }, []);
 
   const fetchProducts = async () => {
     try {
-      const response = await API.get("/products");
+      const response = await API.get("/products/my-products");
       setProducts(response.data);
     } catch (error) {
       console.log("Error fetching products");
     }
   };
 
+  //Handle text input
   const handleChange = (e) => {
     setProduct({
       ...product,
@@ -37,60 +38,100 @@ function SellerDashboard() {
     });
   };
 
-  const handleAddProduct = async (e) => {
+  //Submit Product
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const formData = new FormData();
+    formData.append("name", product.name);
+    formData.append("price", product.price);
+    formData.append("category", product.category);
+    formData.append("description", product.description);
+    formData.append("image", image);
+
     try {
-      await API.post("/products", product);
+      await API.post("/products", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       alert("Product added successfully");
+
       setProduct({
         name: "",
         price: "",
         category: "",
         description: "",
       });
-      fetchProducts(); //refresh product list
+
+      setImage(null);
+      fetchProducts();
+
     } catch (error) {
-      alert("Error adding product");
+      alert(error.response?.data?.message || "Error adding product");
     }
   };
-  const handleLogout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("role");
-  localStorage.removeItem("userId");
 
-  navigate("/");
-};
+  //Delete Product
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
+
+    try {
+      await API.delete(`/products/${id}`);
+      alert("Product deleted successfully");
+      fetchProducts();
+    } catch (error) {
+      alert(error.response?.data?.message || "Delete failed");
+    }
+  };
+
+  // Logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userId");
+    navigate("/");
+  };
 
   return (
     <div className="seller-container">
-      <div className = "row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div className = "col-6">
-          <h2>Seller Dashboard</h2>
-        </div>
-        <div className="col-6">
-          <button
-              onClick={handleLogout}
-              style={{
-                backgroundColor: "#ff4d4d",
-                color: "white",
-                border: "none",
-                padding: "8px 16px",
-                borderRadius: "6px",
-                cursor: "pointer"
-              }}>Logout
-          </button>
-        </div>
+
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2>Seller Dashboard</h2>
+        <button
+          onClick={handleLogout}
+          style={{
+            backgroundColor: "#ff4d4d",
+            color: "white",
+            border: "none",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            cursor: "pointer"
+          }}
+        >
+          Logout
+        </button>
       </div>
+
+      {/* Add Product */}
       <div className="seller-card">
         <h3>Add Product</h3>
-        <form onSubmit={handleAddProduct}>
+
+        <form onSubmit={handleSubmit}>
           <input
             type="text"
             name="name"
             placeholder="Product Name"
             value={product.name}
             onChange={handleChange}
+            required
+          />
+
+          <input
+            type="file"
+            onChange={(e) => setImage(e.target.files[0])}
             required
           />
 
@@ -117,21 +158,22 @@ function SellerDashboard() {
             value={product.description}
             onChange={handleChange}
           />
-          <button
-            className="primary-btn"
-            onClick={() => navigate("/seller")} 
-          >Submit</button>
 
-          <button
-            className="primary-btn"
-            onClick={() => navigate("/seller/orders")}
-          >
-            View Orders
+          <button type="submit" className="primary-btn">
+            Submit
           </button>
-
         </form>
+
+        <button
+          className="primary-btn"
+          style={{ marginTop: "15px" }}
+          onClick={() => navigate("/seller/orders")}
+        >
+          View Orders
+        </button>
       </div>
 
+      {/* Product List */}
       <div className="seller-card">
         <h3>My Products</h3>
 
@@ -141,12 +183,33 @@ function SellerDashboard() {
           <div className="seller-product-list">
             {products.map((p) => (
               <div key={p._id} className="seller-product-item">
-                <strong>{p.name}</strong> – ₹{p.price} ({p.category})
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <strong>{p.name}</strong>
+                    <p>₹{p.price}</p>
+                    <p>{p.category}</p>
+                  </div>
+
+                  <button
+                    onClick={() => handleDelete(p._id)}
+                    style={{
+                      backgroundColor: "#dc2626",
+                      color: "white",
+                      border: "none",
+                      padding: "6px 12px",
+                      borderRadius: "6px",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
     </div>
   );
 }

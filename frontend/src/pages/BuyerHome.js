@@ -123,8 +123,11 @@ const handleLogout = () => {
       <div className="product-grid">
         {products.map((product) => (
           <div className="product-card" key={product._id}>
-            <div className="product-image-placeholder"></div>
-            <h4>{product.name}</h4>
+            <img
+              src={`http://localhost:5000/uploads/${product.image}`}
+              alt={product.name}
+              style={{ width: "100%", height: "150px", objectFit: "cover" }}
+            />
             <p className="category">{product.category}</p>
             <p className="price">₹{product.price}</p>
             <button
